@@ -14,7 +14,7 @@ public class LindoSolver extends Lindo {
 	private static StringBuffer cLicenseKey = new StringBuffer( LS_MAX_ERROR_MESSAGE_LENGTH);
 	
 	public static StringBuffer versionId = new StringBuffer( LS_MAX_ERROR_MESSAGE_LENGTH);
-
+	
 	// RL:
 	public static double adX[] = new double[2];
 	public static double adR[] = new double[2];

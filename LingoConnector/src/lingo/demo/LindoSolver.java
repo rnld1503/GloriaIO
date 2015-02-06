@@ -4,6 +4,37 @@ import com.lindo.*;
 
 import org.apache.log4j.Logger;
 
+/*
+ * 
+
+		Max = 20 * A + 30 * C
+		S.T.
+			       A + 2 * C <= 120 
+			       A         <= 60 
+			               C <= 50
+		 _  _
+		|1  2|
+		|1  0|
+		|0  1|
+		 _  _
+	                        _	_ 
+		 lineal non ceros: [1 1 2 1]
+		            indices 0 1 2 3 
+		
+		column start [0 2 4]  - el 4 es el tamaño vector lineal non zeros
+		
+		el indice de los nonZero en la matriz inicial
+		`[0 1   0 2]
+		
+		Solving such a problem with the LINDO API involves
+		the following steps:
+   		
+   		1. Create a LINDO environment.
+   		2. Create a model in the environment.
+   		3. Specify the model.
+   		4. Perform the optimization.
+   		5. Retrieve the solution.
+ */
 
 public class LindoSolver extends Lindo {
 	
@@ -59,17 +90,19 @@ public class LindoSolver extends Lindo {
 	public static void run(LindoSolver ls, Logger log) throws Exception {
 		_log = log;
 		
-		/* Number of constraints */
+/* Number of constraints */
 		int numeroDeRestricciones = 3;
 
-		/* Number of variables */
+/* Number of variables */
 		int numeroDeVariables = 2;
 
+		
 		int nSolStatus[] = new int[1];
 
-		/* >>> Step 1 <<< Read license file and create a LINDO environment. */
+		/* >>> paso 1 <<< leer el archivo de licencia  y crear el entorno Lingo. */
 		cLicenseKey.setLength(0);
 		nErrorCode[0] = LSloadLicenseString(PATH_LINDOAPI_8_0_LICENSE, cLicenseKey);
+		
 		try {
 			APIErrorCheck(pEnv);
 		} catch (Exception ex) {
@@ -80,6 +113,7 @@ public class LindoSolver extends Lindo {
 		
 		
 		pEnv = LScreateEnv(nErrorCode, cLicenseKey.toString());
+		
 		try {
 			APIErrorCheck(pEnv);
 		} catch (Exception ex) {
@@ -90,38 +124,52 @@ public class LindoSolver extends Lindo {
 		/* >>> Step 2 <<< Create a model in the environment. */
 		/*===================================================*/
 		pModel = LScreateModel(pEnv, nErrorCode);
+		
 		try {
 			APIErrorCheck(pEnv);
 		} catch (Exception ex) {
 			throw (ex);
 		}
-
+		
 		/*
 		 * >>> Step 3 <<< Specify the model.
 		 * 
-		 * /* The direction of optimization (maximizar o minimizar)
+		 * /* direccion de la optimizacion (maximizar o minimizar)
 		 */
 		int nDir = LS_MAX;
 
 		/* The objective's constant term */
 		double dObjConst = 0.;
 
-		/* The coefficients of the objective function */
+/* The coefficients of the objective function */
 		/* Max 20X1 + 30X2  */
-		double adC[] = new double[] { 20., 30. };
+		double coefFunionObjetivo[] = new double[] { 20., 30. };
 
 		/* The right-hand sides of the constraints */
-		/* equivalencias de las constantes */
-		double adB[] = new double[] { 50., 60., 120. };
+		/* equivalencias de las restricciones */
+		double equivalenciasRestricciones[] = new double[] { 120., 60., 50. };
 
-		/* The constraint types ??????? */
+		/* The constraint types ???????  */
+		/* 
+		 * L: less than
+		 * E: equal to
+		 * G: great than
+		 * N: neutral
+		 * */
 		String acConTypes = "LLL";
 
 		/* The number of nonzeros in the constraint matrix */
-		int nNZ = 4;
+		/*Numero de nonzeros en la matrix de las restricciones*/
+		int numeroNonZero = 4;
 
 		/* The indices of the first nonzero in each column */
-		int anBegCol[] = new int[] { 0, 2, nNZ };
+		/*indice del primer nonZero en cada columna*/
+		/*
+		 * 
+		 * 
+		 */
+		
+		int anBegCol[] = new int[] { 0, 2, numeroNonZero };
 
 		/*
 		 * The length of each column. Since we aren't leaving any blanks in our
@@ -133,6 +181,7 @@ public class LindoSolver extends Lindo {
 		double adA[] = new double[] { 1., 1., 2., 1. };
 
 		/* The row indices of the nonzero coefficients */
+		
 		int anRowX[] = new int[] { 0, 1, 0, 2 };
 
 		/*
@@ -150,8 +199,8 @@ public class LindoSolver extends Lindo {
 		 * We have now assembled a full description of the model. We pass this
 		 * information to LSloadLPData with the following call.
 		 */
-		nErrorCode[0] = LSloadLPData(pModel, numeroDeRestricciones, numeroDeVariables, nDir, dObjConst, adC, adB,
-				acConTypes, nNZ, anBegCol, pnLenCol, adA, anRowX, pdLower,
+		nErrorCode[0] = LSloadLPData(pModel, numeroDeRestricciones, numeroDeVariables, nDir, dObjConst, coefFunionObjetivo, equivalenciasRestricciones,
+				acConTypes, numeroNonZero, anBegCol, pnLenCol, adA, anRowX, pdLower,
 				pdUpper);
 		
 		try {
@@ -271,6 +320,5 @@ public class LindoSolver extends Lindo {
 		nErrorCode[0] = LSdeleteEnv(pEnv);
 
 	}
-
 
 }

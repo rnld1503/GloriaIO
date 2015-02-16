@@ -73,7 +73,7 @@ public class SolveModel extends HttpServlet {
             out.println(" = " + HTMLFilter.filter(modelPath));
 			try {			
 				log.info("SolveModel is trying to solve "+modelPath+"/"+modelName);
-				ls.solveFile(ls,log,modelPath+"/"+modelName);
+				//ls.solveFile(ls,log,modelPath+"/"+modelName);
 				log.debug("SolveModel completed!");
 				out.println("<br>SolveModel completed!");
 				out.println("<br>Objective :"+HTMLFilter.filter(String.valueOf(ls.dObj[0])));
